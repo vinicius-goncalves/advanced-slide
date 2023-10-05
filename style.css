@@ -1,0 +1,57 @@
+:root {
+    --button-space: 3%;
+    --img-max-width: 500px;
+    --slide-gap: 15px;
+}
+
+body {
+    display: grid;
+    place-content: center;
+    overflow: hidden;
+}
+
+main {
+    position: relative;
+}
+
+.images {
+    display: flex;
+    max-width: var(--img-max-width);
+    min-height: 100vh;
+    align-items: center;
+    gap: var(--slide-gap);
+    overflow: hidden;
+    filter: drop-shadow(10px 10px 15px #0d0d0d5f);
+    -webkit-filter: drop-shadow(10px 10px 15px #0d0d0d5f);
+}
+
+.images img {
+    max-width: var(--img-max-width);
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+.buttons span {
+    position: absolute;
+    background-color: #ffffffcd;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    top: 50%;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: scale 200ms;
+}
+
+.buttons span:hover {
+    scale: 1.15;
+    cursor: pointer;
+}
+
+.buttons span:first-child {
+    left: var(--button-space);
+}
+
+.buttons span:last-child {
+    right: var(--button-space);
+}
