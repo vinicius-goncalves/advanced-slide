@@ -1,31 +1,30 @@
-import loadImages from './images-loader.js'
-loadImages()
+await import('./images-loader.js')
 
-const allImages = [...document.querySelectorAll('.images img')]
+import * as Utils from './utils.js'
+import updateDots from './dots.js'
+
+let index = 0
 
 const buttons = document.querySelector('.buttons')
 const previousBtn = buttons.querySelector('span[data-button="previous"]')
 const nextBtn = buttons.querySelector('span[data-button="next"]')
 
-let index = 0
+const btnsArray = [previousBtn, nextBtn]
 
-function getElStyle(element) {
-    if(!(element instanceof Element)) {
-        return
-    }
-
-    const elStyle = element.style
-    return elStyle
+function getAllImages() {
+    const imgsContainer = document.querySelector('.imgs')
+    const imgs = imgsContainer.querySelectorAll('img')
+    return [...imgs]
 }
 
-function hideElement(element) {
-    const elStyle = getElStyle(element)
-    elStyle.setProperty('display', 'none')
+function disablePointerEvents(el) {
+    const elStyle = el.style
+    elStyle.setProperty('pointer-events', 'none')
 }
 
-function showElement(element) {
-    const elStyle = getElStyle(element)
-    elStyle.removeProperty('display')
+function enablePointerEvents(el) {
+    const elStyle = el.style
+    elStyle.setProperty('pointer-events', 'auto')
 }
 
 function createSwapAnimation(element, ...keyframes) {
@@ -36,17 +35,14 @@ function createSwapAnimation(element, ...keyframes) {
 
     const animationOptions = {
         duration: 600,
-        easing: 'cubic-bezier(1, .02, 0, .96)',
+        easing: 'cubic-bezier(1, .27, 0, 1)',
         delay: 0
     }
 
-    element.animate(keyframes, animationOptions)
-}
+    btnsArray.forEach(disablePointerEvents)
 
-function createNextAnimation(element) {
-    createSwapAnimation(element,
-        { transform: 'translateX(0)' },
-        { transform: 'translateX(-515px)' })
+    const animation = element.animate(keyframes, animationOptions)
+    animation.onfinish = () => btnsArray.forEach(enablePointerEvents)
 }
 
 function createPreviousAnimation(element) {
@@ -55,45 +51,80 @@ function createPreviousAnimation(element) {
         { transform: 'translateX(0)' })
 }
 
-function getImagesFromCurrIndex(btnType) {
+function createNextAnimation(element) {
 
+    createSwapAnimation(element,
+        { transform: 'translateX(0)' },
+        { transform: 'translateX(-515px)' })
+}
+
+function updateButtonsVisibility(currIndex = index) {
+
+    const allImages = getAllImages()
+
+    const showPreviousBtn = currIndex <= 0 ? 'none' : 'block'
+    const showNextBtn = currIndex == allImages.length - 1 ? 'none' : 'block'
+
+    const entries = new Map([
+        [ previousBtn, showPreviousBtn ],
+        [ nextBtn, showNextBtn ]
+    ])
+
+    for(const [ btn, visibility ] of entries) {
+        btn.style.display = visibility
+    }
+}
+
+function getImagesFromCurrIndex(btnClicked) {
+
+    const allImages = getAllImages()
     const imgsLen = allImages.length
 
-    if(btnType == 'next') {
+    const indexPrevision = btnClicked == 'next' ? index + 1 : index - 1
+    updateButtonsVisibility(indexPrevision)
+
+    if(btnClicked == 'next') {
+
         const currImage = allImages.at(index % imgsLen)
         const nextImage = allImages.at(++index % imgsLen)
+
         return { currImage, nextImage }
     }
 
-    if(btnType == 'previous') {
+    if(btnClicked == 'previous') {
+
         const currImage = allImages.at(index % imgsLen)
         const nextImage = allImages.at(--index + imgsLen % imgsLen)
+
         return { currImage, nextImage }
     }
 }
 
-function updateCurrSlide(btnType) {
+function updateCurrSlide(btnClicked) {
 
-    const { currImage, nextImage } = getImagesFromCurrIndex(btnType)
+    const allImages = getAllImages()
 
-    switch(btnType) {
-        case 'previous':
+    const images = getImagesFromCurrIndex(btnClicked, index)
 
-            showElement(nextImage)
-            Array.of(currImage, nextImage).forEach(createPreviousAnimation)
-
-            break
-
-        case 'next':
-
-            Array.of(currImage, nextImage).forEach(createNextAnimation)
-            const [ currImageAnimation ] = currImage.getAnimations()
-            currImageAnimation.onfinish = () => hideElement(currImage)
-
-            break
-
-        default:
+    if(!images) {
+        return
     }
+
+    const { currImage, nextImage } = images
+
+    if(btnClicked == 'previous') {
+        Utils.showElement(nextImage)
+        Array.of(currImage, nextImage).forEach(createPreviousAnimation)
+    }
+
+    if(btnClicked === 'next') {
+        Array.of(currImage, nextImage).forEach(createNextAnimation)
+
+        const [ currImageAnimation ] = currImage.getAnimations()
+        currImageAnimation.onfinish = () => Utils.hideElement(currImage)
+    }
+
+    setTimeout(() => updateDots(allImages.length, index), 300)
 }
 
 Array.of(previousBtn, nextBtn).forEach(btn => {
@@ -102,3 +133,11 @@ Array.of(previousBtn, nextBtn).forEach(btn => {
         updateCurrSlide(type)
     })
 })
+
+window.addEventListener('DOMContentLoaded', () => {
+    updateButtonsVisibility()
+})
+
+export {
+    updateCurrSlide
+}

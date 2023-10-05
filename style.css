@@ -8,13 +8,14 @@ body {
     display: grid;
     place-content: center;
     overflow: hidden;
+    position: relative;
 }
 
 main {
     position: relative;
 }
 
-.images {
+.imgs {
     display: flex;
     max-width: var(--img-max-width);
     min-height: 100vh;
@@ -23,9 +24,11 @@ main {
     overflow: hidden;
     filter: drop-shadow(10px 10px 15px #0d0d0d5f);
     -webkit-filter: drop-shadow(10px 10px 15px #0d0d0d5f);
+    user-select: none;
+    -webkit-user-select: none;
 }
 
-.images img {
+.imgs img {
     max-width: var(--img-max-width);
     border-radius: 5px;
     object-fit: cover;
@@ -38,9 +41,9 @@ main {
     height: 25px;
     border-radius: 50%;
     top: 50%;
+    transition: scale 200ms;
     user-select: none;
     -webkit-user-select: none;
-    transition: scale 200ms;
 }
 
 .buttons span:hover {
@@ -54,4 +57,40 @@ main {
 
 .buttons span:last-child {
     right: var(--button-space);
+}
+
+.dots {
+    display: flex;
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+}
+
+.dot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 11px;
+    height: 11px;
+    background-color: #cccccc;
+    border-radius: 50%;
+    margin: 0 3px;
+}
+
+.dot:hover::after,
+.dot.active-dot.dot::after  {
+    content: "";
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+}
+
+.dot:hover::after {
+    background-color: #80808043;
+}
+
+.dot.active-dot.dot::after {
+    background-color: #808080;
 }

@@ -8,16 +8,22 @@
     </head>
     <body>
         <main>
-            <div class="images"></div>
-            <div class="buttons">
-                <span
-                    class="material-icons"
-                    data-button="previous">chevron_left</span>
-                <span
-                    class="material-icons"
-                    data-button="next">chevron_right</span>
+            <div data-container="select-imgs">
+                <input type="file" multiple="true" accept="image/*">
+            </div>
+            <div style="display: none;" data-container="imgs-selected">
+                <div class="imgs"></div>
+                <div class="buttons">
+                    <span
+                        class="material-icons"
+                        data-button="previous">chevron_left</span>
+                    <span
+                        class="material-icons"
+                        data-button="next">chevron_right</span>
+                </div>
+                <div class="dots"></div>
             </div>
         </main>
-        <script src="js/app.js" type="module"></script>
+        <script src="js/app.js" type="module" defer></script>
     </body>
 </html>
